@@ -1,10 +1,9 @@
-const studentRoutes = require('./routes/studentRoutes');
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const studentRoutes = require('./routes/studentRoutes'); // ✅ ROUTES
 const Student = require('./models/Student');
-
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -12,8 +11,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-
-
+// ✅ MOUNT ROUTES HERE
+app.use('/api/students', studentRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
@@ -23,7 +22,7 @@ mongoose.connect(process.env.MONGO_URI, {
 .then(() => console.log("✅ Connected to MongoDB"))
 .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Schema
+// (You can keep these if needed)
 const submissionSchema = new mongoose.Schema({
   name: String,
   college: String,
@@ -33,10 +32,8 @@ const submissionSchema = new mongoose.Schema({
   gpa: Number,
   city: String,
 });
-
 const Submission = mongoose.model('Submission', submissionSchema);
 
-// POST route to save form data
 app.post('/api/submit', async (req, res) => {
   try {
     const submission = new Submission(req.body);
@@ -47,12 +44,12 @@ app.post('/api/submit', async (req, res) => {
   }
 });
 
-// GET route to fetch all submissions (optional)
 app.get('/api/submissions', async (req, res) => {
   const submissions = await Submission.find();
   res.json(submissions);
 });
 
+// Student POST route
 app.post('/submit', async (req, res) => {
   try {
     const { name, college, branch, year, skills, gpa, city } = req.body;
@@ -74,7 +71,6 @@ app.post('/submit', async (req, res) => {
     res.status(500).json({ error: 'Failed to save student data' });
   }
 });
-
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
